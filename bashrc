@@ -1,0 +1,95 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoredups:ignorespace
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# support globstar
+shopt -s globstar
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# ensure shell is set to Bash
+SHELL=/bin/bash
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color) color_prompt=yes;;
+esac
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
+    else
+        color_prompt=
+    fi
+fi
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+PS1="\[\e[1;34m\]\W\[\e[0m\] $ "
+PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
+
+# Include bin
+export PATH="$PATH:/src/codevolve/bin"
+
+# Export phantomjs path
+export PATH="/usr/local/bin/phantomjs/bin:$PATH"
+
+# Set DISPLAY=:1 as the default
+export DISPLAY=:1
+
+# Source custom bashrcs, if there are any.
+if ls /root/.bashrcs/* 1> /dev/null 2>&1; then
+    for f in /root/.bashrcs/*; do
+      source "$f"
+    done
+fi
